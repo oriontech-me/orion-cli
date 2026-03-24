@@ -1,19 +1,29 @@
 #!/bin/bash
 set -e
 
-BRANCH=$1
+MODE=$1
+REF=$2
+
 BASE_DIR="$HOME/orion"
 PROJECT_DIR="$BASE_DIR/langflow"
 
-if [[ -z "$BRANCH" ]]; then
-  echo "Uso: orion langflow run <branch>"
+if [[ -z "$MODE" ]]; then
+  echo "Uso:"
+  echo "  orion langflow run <branch>"
+  echo "  orion langflow run pr <PR_NUMBER>"
   exit 1
 fi
 
-echo "➡ Preparando ambiente para Langflow ($BRANCH)..."
+# Compatibilidade: se só passou 1 argumento, assume branch
+if [[ -z "$REF" ]]; then
+  REF="$MODE"
+  MODE="branch"
+fi
+
+echo "➡ Preparando ambiente para Langflow ($MODE: $REF)..."
 
 # -----------------------------------------------------------------------------
-# 1. Instalar dependências básicas (git, curl, etc)
+# 1. Dependências básicas
 # -----------------------------------------------------------------------------
 if ! command -v git >/dev/null 2>&1; then
   echo "→ Instalando git..."
@@ -26,16 +36,16 @@ if ! command -v curl >/dev/null 2>&1; then
 fi
 
 # -----------------------------------------------------------------------------
-# 2. Instalar uv (se necessário)
+# 2. UV
 # -----------------------------------------------------------------------------
 if ! command -v uv >/dev/null 2>&1; then
-  echo "→ Instalando UV..."
+  echo "→ Instalando uv..."
   curl -LsSf https://astral.sh/uv/install.sh | sh
   export PATH="$HOME/.local/bin:$PATH"
 fi
 
 # -----------------------------------------------------------------------------
-# 3. Instalar Python (se necessário)
+# 3. Python
 # -----------------------------------------------------------------------------
 if ! command -v python3 >/dev/null 2>&1; then
   echo "→ Instalando Python..."
@@ -43,7 +53,7 @@ if ! command -v python3 >/dev/null 2>&1; then
 fi
 
 # -----------------------------------------------------------------------------
-# 4. Instalar Node.js + npm (se necessário)
+# 4. Node + npm
 # -----------------------------------------------------------------------------
 if ! command -v npm >/dev/null 2>&1; then
   echo "→ Instalando Node.js e npm..."
@@ -51,7 +61,7 @@ if ! command -v npm >/dev/null 2>&1; then
 fi
 
 # -----------------------------------------------------------------------------
-# 5. Clonar Langflow (se necessário)
+# 5. Clone Langflow
 # -----------------------------------------------------------------------------
 mkdir -p "$BASE_DIR"
 
@@ -63,12 +73,26 @@ fi
 cd "$PROJECT_DIR"
 
 echo "→ Atualizando código..."
-git fetch --all
-git checkout "$BRANCH"
-git pull origin "$BRANCH"
+git fetch origin
+
+if [[ "$MODE" == "pr" ]]; then
+  PR_NUMBER="$REF"
+  LOCAL_BRANCH="pr-$PR_NUMBER"
+
+  echo "→ Rodando PR #$PR_NUMBER"
+
+  git fetch origin "pull/$PR_NUMBER/head:$LOCAL_BRANCH"
+  git checkout "$LOCAL_BRANCH"
+
+else
+  BRANCH="$REF"
+  git checkout .
+  git checkout "$BRANCH"
+  git pull origin "$BRANCH"
+fi
 
 # -----------------------------------------------------------------------------
-# 6. Criar virtualenv e instalar dependências
+# 6. Python env
 # -----------------------------------------------------------------------------
 if [[ ! -d ".venv" ]]; then
   echo "→ Criando ambiente Python..."
@@ -81,7 +105,7 @@ echo "→ Instalando dependências Python..."
 uv pip install -U -e ".[all]"
 
 # -----------------------------------------------------------------------------
-# 7. Build do frontend
+# 7. Frontend build
 # -----------------------------------------------------------------------------
 echo "→ Construindo frontend..."
 cd src/frontend
@@ -90,7 +114,7 @@ npm run build
 cd ../..
 
 # -----------------------------------------------------------------------------
-# 8. Copiar build para backend
+# 8. Sync frontend → backend
 # -----------------------------------------------------------------------------
 BUILD_DIR=""
 [ -d src/frontend/dist ]  && BUILD_DIR=src/frontend/dist
@@ -102,11 +126,11 @@ rm -rf "$TARGET"/*
 cp -r "$BUILD_DIR"/* "$TARGET"/
 
 # -----------------------------------------------------------------------------
-# 9. Rodar Langflow
+# 9. Run Langflow
 # -----------------------------------------------------------------------------
 echo ""
 echo "✔ Ambiente pronto!"
 echo "➡ Iniciando Langflow..."
 echo ""
 
-uv run langflow run --host 0.0.0.0 --port 7860
+uv run langflow run --host 0.0.0.0 --port 7860 --env-file .env
