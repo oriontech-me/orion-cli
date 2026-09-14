@@ -1,7 +1,7 @@
 #!/bin/bash
 # Desinstala a biblioteca de skills do Claude Code padronizadas pela Orion.
 #
-# Reverte exatamente o que 'orion skills install' fez, sem tocar em nada que
+# Reverte exatamente o que 'orion install skills' fez, sem tocar em nada que
 # não veio do catálogo:
 #   - skills/       -> remove as pastas cujo nome existe no catálogo
 #   - CLAUDE.md     -> remove só o bloco delimitado por marcadores
@@ -13,7 +13,7 @@ set -e
 SCOPE=$1
 
 if [[ "$SCOPE" != "global" && "$SCOPE" != "project" ]]; then
-  echo "Uso: orion skills uninstall <global|project>"
+  echo "Uso: orion uninstall skills <global|project>"
   echo "  global  -> remove de ~/.claude"
   echo "  project -> remove de ./.claude e ./CLAUDE.md"
   exit 1

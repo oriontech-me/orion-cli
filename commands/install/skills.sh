@@ -13,7 +13,7 @@ SCOPE=$1
 REPO_URL="${2:-https://github.com/andifilhohub/orion-claudecode-skills.git}"
 
 if [[ "$SCOPE" != "global" && "$SCOPE" != "project" ]]; then
-  echo "Uso: orion skills install <global|project> [repo_url]"
+  echo "Uso: orion install skills <global|project> [repo_url]"
   echo "  global  -> instala em ~/.claude (vale para qualquer projeto)"
   echo "  project -> instala em ./.claude e ./CLAUDE.md (vale só para o repositório atual)"
   exit 1
