@@ -86,9 +86,22 @@ if [[ "$MODE" == "pr" ]]; then
 
 else
   BRANCH="$REF"
+
+  REMOTE="origin"
+  if ! git ls-remote --exit-code --heads origin "$BRANCH" >/dev/null 2>&1; then
+    if git remote get-url fork >/dev/null 2>&1 && git ls-remote --exit-code --heads fork "$BRANCH" >/dev/null 2>&1; then
+      echo "→ Branch não encontrada em 'origin', usando remote 'fork'..."
+      REMOTE="fork"
+    else
+      echo "✗ Branch '$BRANCH' não encontrada em 'origin' nem em 'fork'."
+      exit 1
+    fi
+  fi
+
+  git fetch "$REMOTE" "$BRANCH"
   git checkout .
   git checkout "$BRANCH"
-  git pull origin "$BRANCH"
+  git pull "$REMOTE" "$BRANCH"
 fi
 
 # -----------------------------------------------------------------------------
