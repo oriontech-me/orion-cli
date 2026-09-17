@@ -30,7 +30,7 @@ passar em `--only` antes de instalar.
 
 ### `orion install skills` / `orion uninstall skills`
 
-Instala/remove a [biblioteca de skills do Claude Code](https://github.com/andifilhohub/orion-claudecode-skills)
+Instala/remove a [biblioteca de skills do Claude Code](https://github.com/oriontech-me/orion-claudecode-skills)
 padronizadas pela Orion — skills, `CLAUDE.md` e `settings.json`.
 
 ```bash

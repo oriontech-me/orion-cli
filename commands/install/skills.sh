@@ -29,7 +29,7 @@ while [[ $# -gt 0 ]]; do
 done
 
 SCOPE="${POSITIONAL[0]}"
-REPO_URL="${POSITIONAL[1]:-https://github.com/andifilhohub/orion-claudecode-skills.git}"
+REPO_URL="${POSITIONAL[1]:-https://github.com/oriontech-me/orion-claudecode-skills.git}"
 
 if [[ "$SCOPE" != "global" && "$SCOPE" != "project" ]]; then
   echo "Uso: orion install skills <global|project> [--only skill1,skill2] [repo_url]"
