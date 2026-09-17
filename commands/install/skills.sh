@@ -9,13 +9,35 @@
 #                        arrays recebem apenas os itens novos (sem duplicar).
 set -e
 
-SCOPE=$1
-REPO_URL="${2:-https://github.com/andifilhohub/orion-claudecode-skills.git}"
+ONLY=""
+POSITIONAL=()
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --only=*)
+      ONLY="${1#--only=}"
+      shift
+      ;;
+    --only)
+      ONLY="$2"
+      shift 2
+      ;;
+    *)
+      POSITIONAL+=("$1")
+      shift
+      ;;
+  esac
+done
+
+SCOPE="${POSITIONAL[0]}"
+REPO_URL="${POSITIONAL[1]:-https://github.com/andifilhohub/orion-claudecode-skills.git}"
 
 if [[ "$SCOPE" != "global" && "$SCOPE" != "project" ]]; then
-  echo "Uso: orion install skills <global|project> [repo_url]"
+  echo "Uso: orion install skills <global|project> [--only skill1,skill2] [repo_url]"
   echo "  global  -> instala em ~/.claude (vale para qualquer projeto)"
   echo "  project -> instala em ./.claude e ./CLAUDE.md (vale só para o repositório atual)"
+  echo "  --only  -> instala apenas as skills listadas (nomes separados por vírgula),"
+  echo "             em vez de todas as do catálogo. CLAUDE.md e settings.json são"
+  echo "             sempre mesclados, independente do --only."
   exit 1
 fi
 
@@ -109,16 +131,39 @@ fi
 
 mkdir -p "$SKILLS_TARGET_DIR"
 
+if [[ -n "$ONLY" ]]; then
+  IFS=',' read -ra WANTED <<< "$ONLY"
+else
+  WANTED=()
+fi
+
+wanted() {
+  local name="$1"
+  [[ ${#WANTED[@]} -eq 0 ]] && return 0
+  local w
+  for w in "${WANTED[@]}"; do
+    [[ "$w" == "$name" ]] && return 0
+  done
+  return 1
+}
+
 echo "→ Instalando skills em: $SKILLS_TARGET_DIR"
 COUNT=0
 for skill_dir in "$SRC_SKILLS_DIR"/*/; do
   name=$(basename "$skill_dir")
+  wanted "$name" || continue
   rm -rf "${SKILLS_TARGET_DIR:?}/$name"
   cp -r "$skill_dir" "$SKILLS_TARGET_DIR/$name"
   COUNT=$((COUNT + 1))
   echo "  ✔ $name"
 done
 echo "✔ $COUNT skill(s) instalada(s)/atualizada(s)"
+
+if [[ ${#WANTED[@]} -gt 0 ]]; then
+  for w in "${WANTED[@]}"; do
+    [[ -d "$SRC_SKILLS_DIR/$w" ]] || echo "  ⚠ skill '$w' não encontrada no catálogo — ignorada"
+  done
+fi
 
 CLAUDE_MD_SRC="$CACHE_DIR/claude/CLAUDE.md"
 if [[ -f "$CLAUDE_MD_SRC" ]]; then

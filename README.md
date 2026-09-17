@@ -27,6 +27,9 @@ padronizadas pela Orion — skills, `CLAUDE.md` e `settings.json`.
 orion install skills global      # ~/.claude — vale para qualquer projeto
 orion install skills project     # ./.claude e ./CLAUDE.md — vale só para o repositório atual
 
+orion install skills project --only bug-report              # instala só uma
+orion install skills project --only=bug-report,langflow-auth-token  # ou algumas
+
 orion uninstall skills global
 orion uninstall skills project
 ```
@@ -35,6 +38,10 @@ orion uninstall skills project
   bloco delimitado por marcadores, `settings.json` recebe um deep-merge
   aditivo (só adiciona chaves/itens que faltam). Rodar de novo atualiza
   (`git pull` + recopia) o que já estava instalado.
+- `--only <nomes-separados-por-vírgula>` instala só as skills listadas em vez
+  de todas as do catálogo. `CLAUDE.md` e `settings.json` são sempre
+  mesclados, independente do `--only`. Nome desconhecido gera um aviso e é
+  ignorado (não trava a instalação das demais).
 - `uninstall` reverte exatamente isso: remove as skills, o bloco do
   `CLAUDE.md` e os itens de array que vieram do catálogo em `settings.json` —
   sem tocar em nada que o usuário tinha antes.
