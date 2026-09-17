@@ -18,6 +18,16 @@ orion langflow run pr <PR_NUMBER>
 orion langflow fix-db [caminho-do-langflow]
 ```
 
+### `orion list skills`
+
+```bash
+orion list skills
+```
+
+Sincroniza o catálogo e lista todas as skills disponíveis (nome +
+description, lidos do `SKILL.md` de cada uma) — útil pra decidir o que
+passar em `--only` antes de instalar.
+
 ### `orion install skills` / `orion uninstall skills`
 
 Instala/remove a [biblioteca de skills do Claude Code](https://github.com/andifilhohub/orion-claudecode-skills)
