@@ -22,15 +22,16 @@ fi
 CLAUDE_MD_BEGIN="<!-- orion-skills:begin (gerenciado por orion-claudecode-skills, não edite manualmente entre estas marcações) -->"
 CLAUDE_MD_END="<!-- orion-skills:end -->"
 
-CACHE_DIR="$HOME/orion/claudecode-skills"
+source "$(dirname "${BASH_SOURCE[0]}")/../../lib/catalog.sh"
 if [[ ! -d "$CACHE_DIR" ]]; then
   echo "✗ Catálogo não encontrado em $CACHE_DIR — nada parece ter sido instalado por aqui."
   exit 1
 fi
+catalog_sync
 
-SRC_SKILLS_DIR="$CACHE_DIR/skills"
-CLAUDE_MD_SRC="$CACHE_DIR/claude/CLAUDE.md"
-SETTINGS_SRC="$CACHE_DIR/claude/settings.json"
+SRC_SKILLS_DIR="$CATALOG_SRC/skills"
+CLAUDE_MD_SRC="$CATALOG_SRC/claude/CLAUDE.md"
+SETTINGS_SRC="$CATALOG_SRC/claude/settings.json"
 
 if [[ "$SCOPE" == "global" ]]; then
   SKILLS_TARGET_DIR="$HOME/.claude/skills"

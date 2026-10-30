@@ -47,7 +47,7 @@ orion uninstall skills project
 - `install` nunca sobrescreve o que já existe: `CLAUDE.md` é mesclado num
   bloco delimitado por marcadores, `settings.json` recebe um deep-merge
   aditivo (só adiciona chaves/itens que faltam). Rodar de novo atualiza
-  (`git pull` + recopia) o que já estava instalado.
+  (atualiza o catálogo e recopia) o que já estava instalado.
 - `--only <nomes-separados-por-vírgula>` instala só as skills listadas em vez
   de todas as do catálogo. `CLAUDE.md` e `settings.json` são sempre
   mesclados, independente do `--only`. Nome desconhecido gera um aviso e é
@@ -55,27 +55,14 @@ orion uninstall skills project
 - `uninstall` reverte exatamente isso: remove as skills, o bloco do
   `CLAUDE.md` e os itens de array que vieram do catálogo em `settings.json` —
   sem tocar em nada que o usuário tinha antes.
-- O catálogo fica em `~/orion/claudecode-skills`. `install` e `list` fazem
-  `checkout main` + `pull` ali e param se houver alteração não commitada.
+- O catálogo fica em `~/orion/claudecode-skills`, que é também a pasta de
+  trabalho do time (edição de skills, PRs e aprendizados do
+  [Sieve](https://github.com/remark-so/sieve)). Por isso o `orion` nunca troca
+  de branch nem altera arquivos ali: ele atualiza `origin`, extrai `skills/` e
+  `claude/` de `origin/main` e instala a partir disso. A pasta só avança para o
+  `main` quando já está no `main` e sem alterações; em outra branch ou com
+  alterações pendentes, ela é deixada como está.
 - `example-skill` não é instalada: é só o modelo para criar skills novas.
-
-### `orion install workspace`
-
-Clona ou atualiza a pasta de trabalho de QA do time,
-[`oriontech-me/qa-validation`](https://github.com/oriontech-me/qa-validation),
-em `~/orion/qa-validation`. É ali que cada pessoa abre o Claude Code para
-validar PRs e onde o [Sieve](https://github.com/remark-so/sieve) grava os
-aprendizados compartilhados.
-
-```bash
-orion install workspace
-```
-
-- Se a pasta tiver alterações não commitadas (por exemplo, aprendizados
-  novos do Sieve ainda não revisados), o comando avisa e não atualiza.
-- No fim, mostra o passo único de cada pessoa: abrir o Claude Code na
-  pasta, aceitar a confiança (o `.claude/settings.json` do repositório já
-  declara o plugin do Sieve) e rodar `/sieve --attach`.
 
 ### Acesso aos repositórios privados
 
