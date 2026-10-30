@@ -73,8 +73,9 @@ orion install workspace
 
 - Se a pasta tiver alterações não commitadas (por exemplo, aprendizados
   novos do Sieve ainda não revisados), o comando avisa e não atualiza.
-- No fim, mostra os passos únicos de cada pessoa: instalar o plugin do
-  Sieve e rodar `/sieve --attach`.
+- No fim, mostra o passo único de cada pessoa: abrir o Claude Code na
+  pasta, aceitar a confiança (o `.claude/settings.json` do repositório já
+  declara o plugin do Sieve) e rodar `/sieve --attach`.
 
 ### Acesso aos repositórios privados
 

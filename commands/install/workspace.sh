@@ -35,7 +35,5 @@ fi
 
 echo ""
 echo "Próximos passos (uma vez por pessoa):"
-echo "  1. cd $WORKSPACE_DIR && claude"
-echo "  2. No Claude Code: /plugin marketplace add remark-so/sieve"
-echo "                     /plugin install sieve@sieve"
-echo "                     /sieve --attach"
+echo "  1. cd $WORKSPACE_DIR && claude   (aceite a confiança na pasta: o Sieve carrega sozinho)"
+echo "  2. No Claude Code: /sieve --attach"
