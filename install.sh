@@ -30,7 +30,7 @@ if [ "$UNAME" = "Darwin" ]; then
   # Diretório do CLI
   ORION_HOME="$HOME/orion-cli"
   rm -rf "$ORION_HOME"
-  git clone https://github.com/andifilhohub/orion-cli.git "$ORION_HOME"
+  git clone https://github.com/oriontech-me/orion-cli.git "$ORION_HOME"
 
   # Link binário
   mkdir -p "$HOME/.local/bin"
@@ -66,7 +66,7 @@ apt-get install -y git curl build-essential nodejs python3 python3-pip
 # Diretório do CLI
 ORION_HOME="$HOME/orion-cli"
 rm -rf "$ORION_HOME"
-git clone https://github.com/andifilhohub/orion-cli.git "$ORION_HOME"
+git clone https://github.com/oriontech-me/orion-cli.git "$ORION_HOME"
 
 # Criar link global
 ln -sf "$ORION_HOME/bin/orion" /usr/local/bin/orion

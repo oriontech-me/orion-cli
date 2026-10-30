@@ -5,7 +5,7 @@ CLI para automatizar tarefas como rodar Langflow, deploy, PR checkout, etc.
 ## Instalação
 
 ```bash
-curl -s https://raw.githubusercontent.com/andifilhohub/orion-cli/main/install.sh | bash
+curl -s https://raw.githubusercontent.com/oriontech-me/orion-cli/main/install.sh | bash
 ```
 
 ## Comandos
@@ -55,4 +55,34 @@ orion uninstall skills project
 - `uninstall` reverte exatamente isso: remove as skills, o bloco do
   `CLAUDE.md` e os itens de array que vieram do catálogo em `settings.json` —
   sem tocar em nada que o usuário tinha antes.
+- O catálogo fica em `~/orion/claudecode-skills`. `install` e `list` fazem
+  `checkout main` + `pull` ali e param se houver alteração não commitada.
+- `example-skill` não é instalada: é só o modelo para criar skills novas.
+
+### `orion install workspace`
+
+Clona ou atualiza a pasta de trabalho de QA do time,
+[`oriontech-me/qa-validation`](https://github.com/oriontech-me/qa-validation),
+em `~/orion/qa-validation`. É ali que cada pessoa abre o Claude Code para
+validar PRs e onde o [Sieve](https://github.com/remark-so/sieve) grava os
+aprendizados compartilhados.
+
+```bash
+orion install workspace
+```
+
+- Se a pasta tiver alterações não commitadas (por exemplo, aprendizados
+  novos do Sieve ainda não revisados), o comando avisa e não atualiza.
+- No fim, mostra os passos únicos de cada pessoa: instalar o plugin do
+  Sieve e rodar `/sieve --attach`.
+
+### Acesso aos repositórios privados
+
+O catálogo e a pasta de trabalho são privados. Se o clone falhar com
+"Repository not found", configure o git para usar o login do `gh` uma vez:
+
+```bash
+gh auth login
+gh auth setup-git
+```
 

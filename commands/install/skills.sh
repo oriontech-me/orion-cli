@@ -102,8 +102,18 @@ CACHE_DIR="$HOME/orion/claudecode-skills"
 
 echo "→ Sincronizando catálogo de skills..."
 if [[ ! -d "$CACHE_DIR" ]]; then
-  git clone "$REPO_URL" "$CACHE_DIR"
+  if ! git clone "$REPO_URL" "$CACHE_DIR"; then
+    echo "✗ Não foi possível clonar $REPO_URL."
+    echo "  O catálogo é privado. Configure o acesso uma vez e rode de novo:"
+    echo "    gh auth login && gh auth setup-git"
+    echo "  ou passe a URL SSH: orion install skills $SCOPE git@github.com:oriontech-me/orion-claudecode-skills.git"
+    exit 1
+  fi
 else
+  if [[ -n "$(git -C "$CACHE_DIR" status --porcelain)" ]]; then
+    echo "✗ $CACHE_DIR tem alterações não commitadas; commite ou descarte antes de instalar."
+    exit 1
+  fi
   git -C "$CACHE_DIR" fetch origin
   git -C "$CACHE_DIR" checkout main
   git -C "$CACHE_DIR" pull origin main
@@ -151,6 +161,7 @@ echo "→ Instalando skills em: $SKILLS_TARGET_DIR"
 COUNT=0
 for skill_dir in "$SRC_SKILLS_DIR"/*/; do
   name=$(basename "$skill_dir")
+  [[ "$name" == "example-skill" ]] && continue  # é só o modelo para criar skills novas
   wanted "$name" || continue
   rm -rf "${SKILLS_TARGET_DIR:?}/$name"
   cp -r "$skill_dir" "$SKILLS_TARGET_DIR/$name"
