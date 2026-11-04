@@ -98,18 +98,12 @@ merge_settings_json() {
   mv "$target.orion.tmp" "$target"
 }
 
-CACHE_DIR="$HOME/orion/claudecode-skills"
+source "$(dirname "${BASH_SOURCE[0]}")/../../lib/catalog.sh"
 
 echo "→ Sincronizando catálogo de skills..."
-if [[ ! -d "$CACHE_DIR" ]]; then
-  git clone "$REPO_URL" "$CACHE_DIR"
-else
-  git -C "$CACHE_DIR" fetch origin
-  git -C "$CACHE_DIR" checkout main
-  git -C "$CACHE_DIR" pull origin main
-fi
+catalog_sync "$REPO_URL"
 
-SRC_SKILLS_DIR="$CACHE_DIR/skills"
+SRC_SKILLS_DIR="$CATALOG_SRC/skills"
 if [[ ! -d "$SRC_SKILLS_DIR" ]]; then
   echo "✗ Diretório skills/ não encontrado em $REPO_URL"
   exit 1
@@ -151,6 +145,7 @@ echo "→ Instalando skills em: $SKILLS_TARGET_DIR"
 COUNT=0
 for skill_dir in "$SRC_SKILLS_DIR"/*/; do
   name=$(basename "$skill_dir")
+  [[ "$name" == "example-skill" ]] && continue  # é só o modelo para criar skills novas
   wanted "$name" || continue
   rm -rf "${SKILLS_TARGET_DIR:?}/$name"
   cp -r "$skill_dir" "$SKILLS_TARGET_DIR/$name"
@@ -165,13 +160,13 @@ if [[ ${#WANTED[@]} -gt 0 ]]; then
   done
 fi
 
-CLAUDE_MD_SRC="$CACHE_DIR/claude/CLAUDE.md"
+CLAUDE_MD_SRC="$CATALOG_SRC/claude/CLAUDE.md"
 if [[ -f "$CLAUDE_MD_SRC" ]]; then
   echo "→ Mesclando CLAUDE.md em: $CLAUDE_MD_TARGET"
   merge_claude_md "$CLAUDE_MD_SRC" "$CLAUDE_MD_TARGET"
 fi
 
-SETTINGS_SRC="$CACHE_DIR/claude/settings.json"
+SETTINGS_SRC="$CATALOG_SRC/claude/settings.json"
 if [[ -f "$SETTINGS_SRC" ]]; then
   echo "→ Mesclando settings.json em: $SETTINGS_TARGET"
   merge_settings_json "$SETTINGS_SRC" "$SETTINGS_TARGET"

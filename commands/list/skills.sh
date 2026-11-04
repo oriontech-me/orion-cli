@@ -4,18 +4,12 @@
 set -e
 
 REPO_URL="${1:-https://github.com/oriontech-me/orion-claudecode-skills.git}"
-CACHE_DIR="$HOME/orion/claudecode-skills"
 MAX_DESC=80
 
-if [[ ! -d "$CACHE_DIR" ]]; then
-  git clone -q "$REPO_URL" "$CACHE_DIR"
-else
-  git -C "$CACHE_DIR" fetch -q origin
-  git -C "$CACHE_DIR" checkout -q main
-  git -C "$CACHE_DIR" pull -q origin main
-fi
+source "$(dirname "${BASH_SOURCE[0]}")/../../lib/catalog.sh"
+catalog_sync "$REPO_URL"
 
-SRC_SKILLS_DIR="$CACHE_DIR/skills"
+SRC_SKILLS_DIR="$CATALOG_SRC/skills"
 if [[ ! -d "$SRC_SKILLS_DIR" ]]; then
   echo "✗ Diretório skills/ não encontrado em $REPO_URL"
   exit 1
@@ -28,7 +22,16 @@ for skill_dir in "$SRC_SKILLS_DIR"/*/; do
 
   if [[ -f "$skill_md" ]]; then
     name=$(sed -n 's/^name: *//p' "$skill_md" | head -1)
-    description=$(sed -n 's/^description: *//p' "$skill_md" | head -1)
+    # Aceita description numa linha só ou em bloco YAML (">-", ">", "|", "|-").
+    description=$(awk '
+      /^description:/ {
+        v = $0; sub(/^description:[ \t]*/, "", v)
+        if (v ~ /^[>|]-?$/) { block = 1; v = ""; next }
+        print v; exit
+      }
+      block && /^[ \t]+/ { l = $0; sub(/^[ \t]+/, "", l); v = (v == "" ? l : v " " l); next }
+      block { print v; exit }
+    ' "$skill_md")
     [[ -z "$name" ]] && name="$dir_name"
     [[ -z "$description" ]] && description="(sem description)"
   else
@@ -40,5 +43,5 @@ for skill_dir in "$SRC_SKILLS_DIR"/*/; do
     description="${description:0:$((MAX_DESC - 1))}…"
   fi
 
-  printf "%-22s %s\n" "$name" "$description"
+  printf "%-26s %s\n" "$name" "$description"
 done
