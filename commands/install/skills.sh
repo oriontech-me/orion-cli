@@ -125,6 +125,11 @@ fi
 
 mkdir -p "$SKILLS_TARGET_DIR"
 
+# Instâncias de teste que as skills de QA sobem (qa-test-data, qa-bug-regression-check).
+# Fica em ~/orion, fora do catálogo, e vale para qualquer escopo de instalação.
+QA_RUNS_DIR="$HOME/orion/qa-runs"
+mkdir -p "$QA_RUNS_DIR"
+
 if [[ -n "$ONLY" ]]; then
   IFS=',' read -ra WANTED <<< "$ONLY"
 else
@@ -171,6 +176,8 @@ if [[ -f "$SETTINGS_SRC" ]]; then
   echo "→ Mesclando settings.json em: $SETTINGS_TARGET"
   merge_settings_json "$SETTINGS_SRC" "$SETTINGS_TARGET"
 fi
+
+echo "✔ Pasta das instâncias de teste: $QA_RUNS_DIR"
 
 echo ""
 echo "✔ Instalação concluída."

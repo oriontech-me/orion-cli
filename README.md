@@ -62,6 +62,9 @@ orion uninstall skills project
   `claude/` de `origin/main` e instala a partir disso. A pasta só avança para o
   `main` quando já está no `main` e sem alterações; em outra branch ou com
   alterações pendentes, ela é deixada como está.
+- `install` também cria `~/orion/qa-runs/`, onde as skills de QA
+  (`qa-test-data`, `qa-bug-regression-check`) sobem as instâncias de teste. A
+  pasta fica só na sua máquina, fora do catálogo; se já existir, não é alterada.
 - `example-skill` não é instalada: é só o modelo para criar skills novas.
 
 ### Acesso aos repositórios privados
